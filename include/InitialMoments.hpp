@@ -1,13 +1,11 @@
+#pragma once
+
 /*
 	Calculate the initial filter moments $M_{k, 0}^{(l)}$
 	In this file, we set 
 		k = [0, 20] (22 nodes)
 		l = [0, 3] (cubic piecewise poly)
 */
-
-
-#ifndef _INITIALMOMENT
-#define _INITIALMOMENT
 
 #include <iostream>
 #include <iomanip>
@@ -79,8 +77,3 @@ void initialMoments(stdVec par, stdVec initialMoments, bool output) {
 		}
 	}
 }
-
-
-
-
-#endif

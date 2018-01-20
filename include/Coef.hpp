@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <cmath>
 #include <algorithm>
@@ -9,12 +11,11 @@ using namespace std;
 // only used to store some constants and functions
 // "Jump.h" isn't a proper name
 
-typedef vector< vector< double > > stdMat;
-
 // Originally struct intercoefficient InterCoef_cpp()
 // this part is just copy and paste since there's no elegant way to do this...
 // test this function in `test_coef.cpp`
 stdVec interCoef(Functor& f, double x, double interval) {
+	// use stdVec to store coef, I think it's better than using a struct...
 	stdVec ret(4);
 	
 	ret[0] = f(x) + ((11*f(x) - 18*f(x+interval) + 9*f(x+2*interval) - 
@@ -36,10 +37,6 @@ stdVec interCoef(Functor& f, double x, double interval) {
 }
 
 
-// use stdVec to store coef, I think it's better than using a struct...
-
-
-
 /*
 	Main Dish!
 */
@@ -51,10 +48,8 @@ stdVec interCoef(Functor& f, double x, double interval) {
 		calculate 1 & 2 using
 		3. (i-1) th y0
 		4. i th y
-		5. par = {mu, kappa, theta, xi, rho};
 */
-void BasisCoef(stdVec& alpha, //stdMat& beta, 
-	double y0, double y, const stdVec& par) {
+void BasisCoef(stdVec& alpha, stdMat& beta, double y0, double y) {
 	// determine the interpolation nodes, from the stationary gamma distribution
 	// same as method in InitialMoments.hpp
 	double stLogMean = log(par[2]);
@@ -64,23 +59,8 @@ void BasisCoef(stdVec& alpha, //stdMat& beta,
 		 -0.3, -0.25, -0.2, -0.15, -0.1, -0.05, 0, 0.05, 0.1, 0.2, 0.3, 0.4};
 	for(int i = 0; i < 22; ++i) 
 		interNodes[i] = exp(stLogMean - interNodes[i]*stLogSD) / (par[3]*par[3]/(2*par[1]));
-	/*
-		prepare for the integral
-	*/
-	// conditional mean and sd
-	/*
-	double mu_c = cond_v_mean(par, v0);
-	double var_c = cond_v_var(par, v0);
-	double sd_c = sqrt(cond_v_var(par, v0));
-	NormalPdf pdf_cond(mu_c, var_c);
-	Normalcdf cdf_cond(mu_c, var_c);
-	stdVec p_c(nbasis+1);
-	stdVec phi_c(nbasis+1);
-	transform(interNodes.begin(), interNodes.end(), p_c.begin(), (pdf_cond());
-	transform(interNodes.begin(), interNodes.end(), p_c.begin(), (cdf_cond());
-	*/
 	
-	int i, j;
+	int i;
 	// first calculate alpha easily 
 	MarTranDensity p1_y(y, y0); // the marginal density functional object
 	double stepSize;
@@ -91,7 +71,6 @@ void BasisCoef(stdVec& alpha, //stdMat& beta,
 		tmp = interCoef(p1_y, interNodes[i], stepSize);
 		copy(tmp.begin(), tmp.end(), p_alpha + 4*i);
 	}
-	
 	/* 
 		calculate beta matrix (row first):
 		- first traverse the k nodes, to get the B_k at each interval
@@ -103,6 +82,34 @@ void BasisCoef(stdVec& alpha, //stdMat& beta,
 			2. use transform to get the values of 4 Intgeral at each interval
 				as well as p1_y
 	*/
+	int k, j;
+	// traverse v first then v0, row first
+	for(k = 0; k < nbasis; ++k) {
+		// initialize the four functor
+		Integral0 I0(y, y0, interNodes[i], interNodes[i+1]);
+		Integral0 I1(y, y0, interNodes[i], interNodes[i+1]);
+		Integral0 I2(y, y0, interNodes[i], interNodes[i+1]);
+		Integral0 I3(y, y0, interNodes[i], interNodes[i+1]);
+		for(j = 0; j < nbasis; ++j) {
+			stepSize = (interNodes[j+1] - interNodes[j])/3.0;
+			
+			tmp = interCoef(I0, interNodes[j], stepSize);
+			beta[4*k+0][4*j+0] = tmp[0]; beta[4*k+0][4*j+1] = tmp[1];
+			beta[4*k+0][4*j+2] = tmp[2]; beta[4*k+0][4*j+3] = tmp[3];
+			
+			tmp = interCoef(I1, interNodes[j], stepSize);
+			beta[4*k+1][4*j+0] = tmp[0]; beta[4*k+1][4*j+1] = tmp[1];
+			beta[4*k+1][4*j+2] = tmp[2]; beta[4*k+1][4*j+3] = tmp[3];
+			
+			tmp = interCoef(I2, interNodes[j], stepSize);
+			beta[4*k+2][4*j+0] = tmp[0]; beta[4*k+2][4*j+1] = tmp[1];
+			beta[4*k+2][4*j+2] = tmp[2]; beta[4*k+2][4*j+3] = tmp[3];
+			
+			tmp = interCoef(I3, interNodes[j], stepSize);
+			beta[4*k+3][4*j+0] = tmp[0]; beta[4*k+3][4*j+1] = tmp[1];
+			beta[4*k+3][4*j+2] = tmp[2]; beta[4*k+3][4*j+3] = tmp[3];
+		}
+	}
 }
 
 

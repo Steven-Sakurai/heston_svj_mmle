@@ -1,5 +1,12 @@
 #pragma once
 
+/*
+	This file is for controlling global parameters:
+		- Heston parameters `par`
+		- jump parameters
+		......
+*/
+
 #define Pi 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679
 
 #define Delta 1.0/252.0  // one trading day, interval between obs
@@ -12,8 +19,9 @@ extern const double var_s = 1.0;
 #include <vector>
 
 typedef vector< double > stdVec;
+typedef vector< vector< double > > stdMat;
 
-stdVec par = {0.05, 2.0, 0.2, 0.25, -0.8};
+extern stdVec par = {0.05, 2.0, 0.2, 0.25, -0.8};
 
 /*
 	Some support function to save coding time
