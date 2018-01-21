@@ -9,16 +9,13 @@
 
 #include <iostream>
 #include <iomanip>
-#include <cmath>
-#include <vector>
-using namespace std;
-typedef vector< double > stdVec;
+#include "Jump.hpp"
 
 #include <boost/math/special_functions/gamma.hpp>
 using boost::math::gamma_p;
 
 // the stdMat should be sth like `stdVec initialMoments(4*21-1);`
-void initialMoments(stdVec par, stdVec initialMoments, bool output) {
+void initialMoments(const stdVec& par, stdVec& initialMoments, bool output) {
     double mu = par[0];
     double kappa = par[1];
     double theta = par[2];

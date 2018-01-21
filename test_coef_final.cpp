@@ -8,8 +8,10 @@ int main() {
 	stdVec alpha(84);
 	stdMat beta(84, stdVec(84));
     double y0 = 4.6052, y1 = 4.6195;
-    
-	BasisCoef(alpha, beta, y0, y1);
+
+    int N = 1000;
+    for(int j = 0; j < N; ++j)
+	    BasisCoef(alpha, beta, y0, y1);
 	
     cout << "alpha:" << setprecision(16) << setw(16) << endl;
     for(int i = 0; i < 84; ++i) {
