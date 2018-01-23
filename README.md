@@ -1,2 +1,3 @@
-## For VS Studio in Windows  
-It should be smooth. See `https://blogs.msdn.microsoft.com/vcblog/2016/10/05/cmake-support-in-visual-studio/`
+ # Deprecated  
+ This repo's code is more elegant and easy to read but terribly slow...  
+ Remain this repo in case that serious problem can't be solved ...  
